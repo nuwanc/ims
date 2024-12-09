@@ -284,6 +284,39 @@ def get_my_diagnostic_reports():
 
     return jsonify(result)
 
+@app.route('/my-diagnostic-reports/<int:report_id>', methods=['GET'])
+@jwt_required()
+def get_report_details(report_id):
+    claims = get_jwt()
+    user_id = get_jwt_identity()
+
+    # Ensure the user is a patient
+    if claims.get('role') != 'patient':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Fetch the diagnostic report for the patient
+    report = DiagnosticReport.query.filter_by(id=report_id, patient_id=user_id).first()
+    if not report:
+        return jsonify({'message': 'Report not found'}), 404
+
+    # Fetch associated images
+    images = DiagnosticImage.query.filter_by(report_id=report_id).all()
+    image_data = [{'id': img.id, 'filename': img.filename} for img in images]
+
+    # Construct response
+    response = {
+        'report': {
+            'id': report.id,
+            'type': report.type,
+            'description': report.description,
+            'created_at': report.created_at,
+        },
+        'images': image_data,
+    }
+
+    return jsonify(response), 200
+
+
 @app.route('/diagnostic-reports/<int:report_id>/add-comment', methods=['POST'])
 @jwt_required()
 def add_report_comment(report_id):

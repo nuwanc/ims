@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Box, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
 import api from '../services/api';
 
 const PatientSearch = ({ onSelectPatient }) => {
@@ -7,34 +8,34 @@ const PatientSearch = ({ onSelectPatient }) => {
 
   const searchPatients = async () => {
     try {
-      const response = await api.get('/patients', {
-        params: { role: 'patient', query },
-      });
+      const response = await api.get('/patients', { params: { role: 'patient', query } });
       setPatients(response.data);
     } catch (err) {
       console.error('Error fetching patients:', err);
     }
   };
-  
+
   return (
-    <div>
-      <h3>Search Patients</h3>
-      <input
-        type="text"
+    <Box sx={{ padding: 4 }}>
+      <TextField
+        label="Search Patients"
+        variant="outlined"
+        fullWidth
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search by name or email"
+        sx={{ marginBottom: 2 }}
       />
-      <button onClick={searchPatients}>Search</button>
-      <ul>
+      <Button variant="contained" color="primary" onClick={searchPatients}>
+        Search
+      </Button>
+      <List sx={{ marginTop: 2 }}>
         {patients.map((patient) => (
-          <li key={patient.id}>
-            {patient.email} - {patient.role}
-            <button onClick={() => onSelectPatient(patient)}>Select</button>
-          </li>
+          <ListItem key={patient.id} button onClick={() => onSelectPatient(patient)}>
+            <ListItemText primary={patient.email} secondary={`Role: ${patient.role}`} />
+          </ListItem>
         ))}
-      </ul>
-    </div>
+      </List>
+    </Box>
   );
 };
 

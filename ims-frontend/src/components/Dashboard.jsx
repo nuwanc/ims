@@ -24,7 +24,7 @@ const Dashboard = () => {
   }
 
   const navivateToDoctorDashboard = () => {
-    navigate('/doctor-dahsboard')
+    navigate('/doctor-dashboard')
   }
 
   return (

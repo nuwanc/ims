@@ -8,12 +8,44 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ReportManagement from './components/ReportManagement';
 import PatientReports from './components/PatientReports';
 import DoctorDashboard from './components/DoctorDashboard';
+import AdminDashboard from './components/dashboard/AdminDashboard';
+import PatientDashboard from './components/dashboard/PatientDashboard';
+import ReportDetails from './components/ReportDetails';
 
 const App = () => {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+
+
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/patient-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <PatientDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/report-details/:reportId"
+          element={
+            <ProtectedRoute allowedRoles={['patient']}>
+              <ReportDetails />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard"
           element={
@@ -46,8 +78,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-         <Route
-          path="/doctor-dahsboard"
+        <Route
+          path="/doctor-dashboard"
           element={
             <ProtectedRoute allowedRoles={['doctor']}>
               <DoctorDashboard />
