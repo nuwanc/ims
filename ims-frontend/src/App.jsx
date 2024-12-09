@@ -11,6 +11,7 @@ import DoctorDashboard from './components/dashboard/DoctorDashboard';
 import AdminDashboard from './components/dashboard/AdminDashboard';
 import PatientDashboard from './components/dashboard/PatientDashboard';
 import ReportDetails from './components/ReportDetails';
+import StaffDashboard from './components/dashboard/StaffDashboard';
 
 const App = () => {
   return (
@@ -49,11 +50,21 @@ const App = () => {
         <Route
           path="/report-details/:reportId"
           element={
-            <ProtectedRoute allowedRoles={['patient','doctor']}>
+            <ProtectedRoute allowedRoles={['patient','doctor','medical_staff']}>
               <ReportDetails />
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/medical-staff-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['medical_staff']}>
+              <StaffDashboard />
+            </ProtectedRoute>
+          }
+        />
+      
 
         <Route
           path="/dashboard"

@@ -291,7 +291,7 @@ def get_report_details(report_id):
     user_id = get_jwt_identity()
 
     # Ensure the user is a patient
-    if claims.get('role') not in ['patient', 'doctor']:
+    if claims.get('role') not in ['patient', 'doctor', 'medical_staff']:
         return jsonify({'message': 'Unauthorized'}), 403
 
     # Fetch the diagnostic report for the patient
@@ -306,6 +306,7 @@ def get_report_details(report_id):
     # Fetch associated images
     images = DiagnosticImage.query.filter_by(report_id=report_id).all()
     image_data = [{'id': img.id, 'filename': img.filename} for img in images]
+    updated_by_user = User.query.get(report.updated_by) if report.updated_by else None
 
     # Construct response
     response = {
@@ -313,6 +314,10 @@ def get_report_details(report_id):
             'id': report.id,
             'type': report.type,
             'description': report.description,
+            'diagnosis': report.diagnosis,
+            'comment': report.comment,
+            'updated_by': updated_by_user.email if updated_by_user else None,
+            'updated_at': report.updated_at,
             'created_at': report.created_at,
         },
         'images': image_data,
@@ -325,6 +330,8 @@ def get_report_details(report_id):
 @jwt_required()
 def add_report_comment(report_id):
     claims = get_jwt()
+    user_id = get_jwt_identity()
+
     if claims.get('role') != 'doctor':
         return jsonify({'message': 'Unauthorized'}), 403
 
@@ -332,15 +339,16 @@ def add_report_comment(report_id):
     diagnosis = data.get('diagnosis')
     comment = data.get('comment')
 
-    # Validate report exists
     report = DiagnosticReport.query.get_or_404(report_id)
 
-    # Update the report with diagnosis and comment
-    report.diagnosis = diagnosis  # Assuming a `diagnosis` column in DiagnosticReport
-    report.comment = comment  # Assuming a `comment` column in DiagnosticReport
+    report.diagnosis = diagnosis
+    report.comment = comment
+    report.updated_by = user_id
+    report.updated_at = datetime.utcnow()
     db.session.commit()
 
     return jsonify({'message': 'Comment added successfully'}), 200
+
 
 
 

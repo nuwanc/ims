@@ -39,17 +39,17 @@ const ReportDetails = () => {
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
         try {
-          await api.post(`/diagnostic-reports/${report.id}/add-comment`, {
-            diagnosis,
-            comment,
-          });
-          setSuccess('Comment added successfully');
-          setDiagnosis('');
-          setComment('');
-          setShow(false)
+            await api.post(`/diagnostic-reports/${report.id}/add-comment`, {
+                diagnosis,
+                comment,
+            });
+            setSuccess('Comment added successfully');
+            setDiagnosis('');
+            setComment('');
+            setShow(false)
         } catch (err) {
-          setError('Error adding comment');
-          console.error(err);
+            setError('Error adding comment');
+            console.error(err);
         }
     };
 
@@ -59,6 +59,8 @@ const ReportDetails = () => {
             navigate('/patient-dashboard')
         } else if (role == 'doctor') {
             navigate('/doctor-dashboard')
+        } else if (role == 'medical_staff') {
+            navigate('/medical-staff-dashboard')
         }
     }
 
@@ -91,46 +93,46 @@ const ReportDetails = () => {
                 </Button>
                 {role == 'doctor' && <Button variant="outlined" onClick={handleShowComments} sx={{ marginBottom: 2 }}>Add Diagnosis/Comment</Button>}
                 {success && <Typography color="success">{success}</Typography>}
-                {show  && (
+                {show && (
                     <Paper elevation={3} sx={{ padding: 4, marginTop: 3 }}>
-                    <Typography variant="h5" gutterBottom>
-                      Add Diagnosis/Comment for Report: {report.id}
-                    </Typography>
-                    <form onSubmit={handleCommentSubmit}>
-                      <Box sx={{ marginBottom: 2 }}>
-                        <TextField
-                          label="Diagnosis"
-                          multiline
-                          rows={4}
-                          variant="outlined"
-                          fullWidth
-                          value={diagnosis}
-                          onChange={(e) => setDiagnosis(e.target.value)}
-                          required
-                        />
-                      </Box>
-                      <Box sx={{ marginBottom: 2 }}>
-                        <TextField
-                          label="Comment"
-                          multiline
-                          rows={4}
-                          variant="outlined"
-                          fullWidth
-                          value={comment}
-                          onChange={(e) => setComment(e.target.value)}
-                          required
-                        />
-                      </Box>
-                      <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        sx={{ padding: 1 }}
-                      >
-                        Submit
-                      </Button>
-                    </form>
-                  </Paper>
+                        <Typography variant="h5" gutterBottom>
+                            Add Diagnosis/Comment for Report: {report.id}
+                        </Typography>
+                        <form onSubmit={handleCommentSubmit}>
+                            <Box sx={{ marginBottom: 2 }}>
+                                <TextField
+                                    label="Diagnosis"
+                                    multiline
+                                    rows={4}
+                                    variant="outlined"
+                                    fullWidth
+                                    value={diagnosis}
+                                    onChange={(e) => setDiagnosis(e.target.value)}
+                                    required
+                                />
+                            </Box>
+                            <Box sx={{ marginBottom: 2 }}>
+                                <TextField
+                                    label="Comment"
+                                    multiline
+                                    rows={4}
+                                    variant="outlined"
+                                    fullWidth
+                                    value={comment}
+                                    onChange={(e) => setComment(e.target.value)}
+                                    required
+                                />
+                            </Box>
+                            <Button
+                                type="submit"
+                                variant="contained"
+                                color="primary"
+                                sx={{ padding: 1 }}
+                            >
+                                Submit
+                            </Button>
+                        </form>
+                    </Paper>
                 )}
                 {error && <Typography color="error">{error}</Typography>}
                 {report && (
@@ -144,6 +146,30 @@ const ReportDetails = () => {
                         <Typography variant="body1" gutterBottom>
                             <strong>Created At:</strong> {new Date(report.created_at).toLocaleString()}
                         </Typography>
+                        <Box sx={{ marginTop: 4 }}>
+                            <Typography variant="h5" gutterBottom>
+                                Diagnosis & Comment
+                            </Typography>
+                            {report.diagnosis ? (
+                                <Typography variant="body1" gutterBottom>
+                                    <strong>Diagnosis:</strong> {report.diagnosis}
+                                </Typography>
+                            ) : (
+                                <Typography>No diagnosis available</Typography>
+                            )}
+                            {report.comment ? (
+                                <Typography variant="body1" gutterBottom>
+                                    <strong>Comment:</strong> {report.comment}
+                                </Typography>
+                            ) : (
+                                <Typography>No comment available</Typography>
+                            )}
+                            {report.updated_by && (
+                                <Typography variant="body2" color="textSecondary">
+                                    Last updated by: {report.updated_by} at {new Date(report.updated_at).toLocaleString()}
+                                </Typography>
+                            )}
+                        </Box>
                         <Typography variant="h5" sx={{ marginTop: 3, marginBottom: 2 }}>
                             Attached Images
                         </Typography>

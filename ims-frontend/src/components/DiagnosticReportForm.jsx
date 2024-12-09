@@ -1,4 +1,16 @@
 import React, { useState } from 'react';
+import {
+  Box,
+  TextField,
+  Button,
+  Typography,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  Alert,
+  Paper,
+} from '@mui/material';
 import api from '../services/api';
 
 const DiagnosticReportForm = ({ patient, onReportCreated }) => {
@@ -22,28 +34,54 @@ const DiagnosticReportForm = ({ patient, onReportCreated }) => {
   };
 
   return (
-    <div>
-      <h3>Create Diagnostic Report for {patient.email}</h3>
+    <Paper elevation={3} sx={{ padding: 4, marginTop: 3 }}>
+      <Typography variant="h5" gutterBottom>
+        Create Diagnostic Report for {patient.email}
+      </Typography>
       <form onSubmit={handleSubmit}>
-        <div>
-          <label>Type:</label>
-          <select value={type} onChange={(e) => setType(e.target.value)}>
-            <option value="xray">X-Ray</option>
-            <option value="ct">CT Scan</option>
-            <option value="mri">MRI</option>
-          </select>
-        </div>
-        <div>
-          <label>Description:</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-        <button type="submit">Create Report</button>
+        {/* Type Selector */}
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="type-select-label">Type</InputLabel>
+          <Select
+            labelId="type-select-label"
+            value={type}
+            onChange={(e) => setType(e.target.value)}
+            required
+          >
+            <MenuItem value="xray">X-Ray</MenuItem>
+            <MenuItem value="ct">CT Scan</MenuItem>
+            <MenuItem value="mri">MRI</MenuItem>
+          </Select>
+        </FormControl>
+
+        {/* Description Field */}
+        <TextField
+          label="Description"
+          multiline
+          rows={4}
+          variant="outlined"
+          fullWidth
+          margin="normal"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+        />
+
+        {/* Error Message */}
+        {error && <Alert severity="error" sx={{ marginBottom: 2 }}>{error}</Alert>}
+
+        {/* Submit Button */}
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          fullWidth
+          sx={{ padding: 1 }}
+        >
+          Create Report
+        </Button>
       </form>
-    </div>
+    </Paper>
   );
 };
 
