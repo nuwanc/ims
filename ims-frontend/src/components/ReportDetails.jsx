@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Grid, Paper, Button, AppBar, Toolbar } from '@mui/material';
+import { Box, Typography, Grid, Paper, Button, AppBar, Toolbar, TextField } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ImageViewer from './ImageViewer';
@@ -9,7 +9,12 @@ const ReportDetails = () => {
     const [report, setReport] = useState(null);
     const [images, setImages] = useState([]);
     const [error, setError] = useState('');
+    const [show, setShow] = useState(false);
+    const [diagnosis, setDiagnosis] = useState('');
+    const [comment, setComment] = useState('');
+    const [success, setSuccess] = useState('');
     const navigate = useNavigate();
+    const role = localStorage.getItem('role');
 
     useEffect(() => {
         const fetchReportDetails = async () => {
@@ -31,6 +36,36 @@ const ReportDetails = () => {
         window.location.href = '/'; // Redirect to login page
     };
 
+    const handleCommentSubmit = async (e) => {
+        e.preventDefault();
+        try {
+          await api.post(`/diagnostic-reports/${report.id}/add-comment`, {
+            diagnosis,
+            comment,
+          });
+          setSuccess('Comment added successfully');
+          setDiagnosis('');
+          setComment('');
+          setShow(false)
+        } catch (err) {
+          setError('Error adding comment');
+          console.error(err);
+        }
+    };
+
+    const handleBackToReport = () => {
+        let role = localStorage.getItem('role');
+        if (role == 'patient') {
+            navigate('/patient-dashboard')
+        } else if (role == 'doctor') {
+            navigate('/doctor-dashboard')
+        }
+    }
+
+    const handleShowComments = () => {
+        setShow(!show);
+    }
+
     return (
         <>
             <AppBar position="static">
@@ -51,9 +86,52 @@ const ReportDetails = () => {
                 </Toolbar>
             </AppBar>
             <Box sx={{ padding: 4 }}>
-                <Button variant="outlined" onClick={() => navigate('/patient-dashboard')} sx={{ marginBottom: 2 }}>
+                <Button variant="outlined" onClick={handleBackToReport} sx={{ marginBottom: 2 }}>
                     Back to Reports
                 </Button>
+                {role == 'doctor' && <Button variant="outlined" onClick={handleShowComments} sx={{ marginBottom: 2 }}>Add Diagnosis/Comment</Button>}
+                {success && <Typography color="success">{success}</Typography>}
+                {show  && (
+                    <Paper elevation={3} sx={{ padding: 4, marginTop: 3 }}>
+                    <Typography variant="h5" gutterBottom>
+                      Add Diagnosis/Comment for Report: {report.id}
+                    </Typography>
+                    <form onSubmit={handleCommentSubmit}>
+                      <Box sx={{ marginBottom: 2 }}>
+                        <TextField
+                          label="Diagnosis"
+                          multiline
+                          rows={4}
+                          variant="outlined"
+                          fullWidth
+                          value={diagnosis}
+                          onChange={(e) => setDiagnosis(e.target.value)}
+                          required
+                        />
+                      </Box>
+                      <Box sx={{ marginBottom: 2 }}>
+                        <TextField
+                          label="Comment"
+                          multiline
+                          rows={4}
+                          variant="outlined"
+                          fullWidth
+                          value={comment}
+                          onChange={(e) => setComment(e.target.value)}
+                          required
+                        />
+                      </Box>
+                      <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        sx={{ padding: 1 }}
+                      >
+                        Submit
+                      </Button>
+                    </form>
+                  </Paper>
+                )}
                 {error && <Typography color="error">{error}</Typography>}
                 {report && (
                     <>

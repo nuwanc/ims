@@ -291,11 +291,15 @@ def get_report_details(report_id):
     user_id = get_jwt_identity()
 
     # Ensure the user is a patient
-    if claims.get('role') != 'patient':
+    if claims.get('role') not in ['patient', 'doctor']:
         return jsonify({'message': 'Unauthorized'}), 403
 
     # Fetch the diagnostic report for the patient
-    report = DiagnosticReport.query.filter_by(id=report_id, patient_id=user_id).first()
+    if claims.get('role') == 'patient':
+        report = DiagnosticReport.query.filter_by(id=report_id, patient_id=user_id).first()
+    else :
+        report = DiagnosticReport.query.filter_by(id=report_id).first()
+
     if not report:
         return jsonify({'message': 'Report not found'}), 404
 

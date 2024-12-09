@@ -1,14 +1,23 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  Typography,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import ImageViewer from './ImageViewer';
 
 const DoctorViewReports = ({ patient }) => {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState('');
-  const [selectedReport, setSelectedReport] = useState(null);
-  const [diagnosis, setDiagnosis] = useState('');
-  const [comment, setComment] = useState('');
-  const [success, setSuccess] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -22,78 +31,53 @@ const DoctorViewReports = ({ patient }) => {
     };
 
     fetchReports();
-  }, [patient]);
+  }, [patient.id]);
 
-  const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await api.post(`/diagnostic-reports/${selectedReport.id}/add-comment`, {
-        diagnosis,
-        comment,
-      });
-      setSuccess('Comment added successfully');
-      setDiagnosis('');
-      setComment('');
-    } catch (err) {
-      setError('Error adding comment');
-      console.error(err);
-    }
+  const viewReportDetails = (reportId) => {
+    navigate(`/report-details/${reportId}`);
   };
 
   return (
-    <div>
-      <h3>Diagnostic Reports for {patient.email}</h3>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
-      {success && <p style={{ color: 'green' }}>{success}</p>}
+    <Box sx={{ padding: 4 }}>
+      <Typography variant="h4" gutterBottom>
+        Diagnostic Reports for {patient.email}
+      </Typography>
+      {error && <Typography color="error">{error}</Typography>}
       {reports.length === 0 ? (
-        <p>No reports found</p>
+        <Typography>No reports found</Typography>
       ) : (
-        reports.map((report) => (
-          <div key={report.id} style={{ border: '1px solid #ccc', margin: '10px', padding: '10px' }}>
-            <h4>Report Type: {report.type}</h4>
-            <p>{report.description}</p>
-            <p><strong>Diagnosis:</strong> {report.diagnosis || 'None'}</p>
-            <p><strong>Comment:</strong> {report.comment || 'None'}</p>
-            <p><strong>Created At:</strong> {new Date(report.created_at).toLocaleString()}</p>
-            <h5>Images</h5>
-            {report.images.length === 0 ? (
-              <p>No images attached</p>
-            ) : (
-              report.images.map((image) => (
-                <div key={image.id}>
-                  <p>{image.filename}</p>
-                  <ImageViewer imageId={image.id} />
-                </div>
-              ))
-            )}
-            <button onClick={() => setSelectedReport(report)}>Add Diagnosis/Comment</button>
-          </div>
-        ))
+        <TableContainer component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>Type</strong></TableCell>
+                <TableCell><strong>Description</strong></TableCell>
+                <TableCell><strong>Created At</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {reports.map((report) => (
+                <TableRow key={report.id}>
+                  <TableCell>{report.type}</TableCell>
+                  <TableCell>{report.description}</TableCell>
+                  <TableCell>{new Date(report.created_at).toLocaleString()}</TableCell>
+                  <TableCell>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => viewReportDetails(report.id)}
+                    >
+                      View Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       )}
-
-      {selectedReport && (
-        <div style={{ marginTop: '20px' }}>
-          <h4>Add Diagnosis/Comment for Report: {selectedReport.id}</h4>
-          <form onSubmit={handleCommentSubmit}>
-            <div>
-              <label>Diagnosis:</label>
-              <textarea
-                value={diagnosis}
-                onChange={(e) => setDiagnosis(e.target.value)}
-              />
-            </div>
-            <div>
-              <label>Comment:</label>
-              <textarea
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-              />
-            </div>
-            <button type="submit">Submit</button>
-          </form>
-        </div>
-      )}
-    </div>
+    </Box>
   );
 };
 

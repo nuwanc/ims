@@ -30,7 +30,7 @@ const PatientSearch = ({ onSelectPatient }) => {
       </Button>
       <List sx={{ marginTop: 2 }}>
         {patients.map((patient) => (
-          <ListItem key={patient.id} button onClick={() => onSelectPatient(patient)}>
+          <ListItem key={patient.id} button onClick={() => {onSelectPatient(patient); localStorage.setItem('selectedPatient',patient)}}>
             <ListItemText primary={patient.email} secondary={`Role: ${patient.role}`} />
           </ListItem>
         ))}
