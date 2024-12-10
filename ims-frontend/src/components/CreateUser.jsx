@@ -9,17 +9,16 @@ import { Box,
   InputLabel,
   Alert,
   CircularProgress,
-  Paper, AppBar, Toolbar } from '@mui/material';
+  Paper } from '@mui/material';
 import api from '../services/api';
-import { useNavigate } from 'react-router-dom';
 
 const CreateUser = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('patient');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,7 +26,7 @@ const CreateUser = () => {
     setLoading(true);
     try {
       await api.post('/users', { email, password, role });
-      navigate('/user-management'); // Redirect to the User Management page
+      setSuccess('User Creation Successful.');
     } catch (err) {
       setError('Error creating user. Please try again.');
       console.error(err);
@@ -36,75 +35,14 @@ const CreateUser = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.clear(); // Clear token and role
-    window.location.href = '/'; // Redirect to login page
-  };
-
-  const navigateToAdminHome = () => {
-    navigate('/admin-dashboard')
-  }
-
-  const handleUsersList = () => {
-    navigate('/user-management'); // Navigate to the Users List page
-  };
-
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            IMS
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Button
-              color="inherit"
-              onClick={navigateToAdminHome}
-            >
-              Home
-            </Button>
-
-            <Button
-              color="inherit"
-              onClick={handleUsersList}
-            >
-              Users
-            </Button>
-
-            <Button
-              color="inherit"
-              onClick={handleLogout}
-              sx={{ ml: 2 }}
-            >
-              Logout
-            </Button>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      <Box
-      sx={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        minHeight: '100vh',
-        backgroundColor: '#f5f5f5',
-      }}
-    >
-      <Paper
-        elevation={4}
-        sx={{
-          padding: 4,
-          maxWidth: 400,
-          width: '100%',
-          textAlign: 'center',
-          borderRadius: 2,
-        }}
-      >
+      <Paper elevation={3} sx={{ padding: 4, marginTop: 3 }}>
         <Typography variant="h5" component="h1" gutterBottom>
           Create User
         </Typography>
         {error && <Alert severity="error" sx={{ marginBottom: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ marginBottom: 2 }}>{success}</Alert>}
         <form onSubmit={handleSubmit}>
           <TextField
             label="Email"
@@ -154,7 +92,6 @@ const CreateUser = () => {
           </Box>
         </form>
       </Paper>
-    </Box>
     </>
   );
 };

@@ -1,7 +1,9 @@
+from datetime import datetime
 from flask import Flask, request, jsonify, make_response
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, get_jwt_identity
 from flask_cors import CORS
+from sqlalchemy import not_
 from models import db, User, DiagnosticReport, DiagnosticImage
 from utils import hash_password, check_password, encrypt_data, decrypt_data
 import os
@@ -10,7 +12,7 @@ from flask_migrate import Migrate
 
 app = Flask(__name__)
 # Configure CORS for the app with specific headers and methods
-CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "OPTIONS"], supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "OPTIONS", "DELETE"], supports_credentials=True)
 
 # Configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
@@ -85,7 +87,21 @@ def list_users():
     if claims.get('role') != 'admin':
         return jsonify({'message': 'Unauthorized'}), 403
     
-    users = User.query.all()
+        # Get query parameters
+    role = request.args.get('role')
+    query = request.args.get('query', '').lower()  # Default to an empty string
+    
+    # Query the database
+    users_query = User.query
+    if (query == ''):
+        users_query = users_query.filter(not_(User.role == 'admin'))
+        users = users_query.all()
+    else:
+        users_query = users_query.filter(
+            (User.email.ilike(f"%{query}%")) | (User.id.ilike(f"%{query}%"))
+        ) 
+        users = users_query.all()
+
     return jsonify([{'id': u.id, 'email': u.email, 'role': u.role} for u in users])
 
 @app.route('/patients', methods=['GET'])

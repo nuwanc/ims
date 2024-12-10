@@ -9,7 +9,6 @@ import ViewReports from '../ViewReports';
 const StaffDashboard = () => {
     const [selectedPatient, setSelectedPatient] = useState(null);
     const [createdReportId, setCreatedReportId] = useState(null);
-    const [viewReports, setViewReports] = useState(false);
 
     const handleLogout = () => {
         localStorage.clear(); // Clear token and role

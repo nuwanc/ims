@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, TextField, Button, List, ListItem, ListItemText } from '@mui/material';
+import { Box, TextField, Button, List, ListItem, ListItemText, Typography } from '@mui/material';
 import api from '../services/api';
 
 const PatientSearch = ({ onSelectPatient }) => {
@@ -29,8 +29,10 @@ const PatientSearch = ({ onSelectPatient }) => {
         Search
       </Button>
       <List sx={{ marginTop: 2 }}>
-        {patients.map((patient) => (
-          <ListItem key={patient.id} button onClick={() => {onSelectPatient(patient); localStorage.setItem('selectedPatient',patient)}}>
+        { patients.length === 0 ? 
+          (<Typography>No users found</Typography>) :
+        patients.map((patient) => (
+          <ListItem key={patient.id} button onClick={() => {onSelectPatient(patient);}}>
             <ListItemText primary={patient.email} secondary={`Role: ${patient.role}`} />
           </ListItem>
         ))}

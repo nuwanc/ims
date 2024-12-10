@@ -1,13 +1,10 @@
 import React from 'react';
 import { Box, Button, Typography, AppBar, Toolbar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import UserManagement from '../UserManagement';
 
 const AdminDashboard = () => {
     const navigate = useNavigate();
-
-    const handleUsersList = () => {
-        navigate('/user-management'); // Navigate to the Users List page
-    };
 
     const handleLogout = () => {
         localStorage.clear(); // Clear token and role
@@ -25,13 +22,6 @@ const AdminDashboard = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Button
                             color="inherit"
-                            onClick={handleUsersList}
-                        >
-                            Users
-                        </Button>
-
-                        <Button
-                            color="inherit"
                             onClick={handleLogout}
                             sx={{ ml: 2 }}
                         >
@@ -41,9 +31,7 @@ const AdminDashboard = () => {
                 </Toolbar>
             </AppBar>
             <Box sx={{ padding: 4 }}>
-                <Typography variant="h4" gutterBottom>
-                    Admin Dashboard
-                </Typography>
+                <UserManagement/>
             </Box>
         </>
     );
