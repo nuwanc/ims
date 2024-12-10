@@ -3,15 +3,18 @@ import {
   Box,
   Button,
   Typography,
+  Tab, Tabs
 } from '@mui/material';
 import CreateUser from './CreateUser';
 import UserSearch from './UserSearch';
 import AuditLogs from './AuditLogs';
 
 const UserManagement = () => {
-  const [showCreateUser, setShowCreateUser] = useState(false);
-  const [showSearchUser, setShowSearchUser] = useState(false);
-  const [showAuditLog, setShowAuditLog] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
 
   return (
@@ -20,18 +23,35 @@ const UserManagement = () => {
         <Typography variant="h4" gutterBottom>
           User Management
         </Typography>
-        <Button variant="outlined" onClick={(e)=>setShowCreateUser(!showCreateUser)} sx={{ marginBottom: 2 , marginLeft: 2}}>
-          Create User
-        </Button>
-        <Button variant="outlined" onClick={(e)=>setShowSearchUser(!showSearchUser)} sx={{ marginBottom: 2 , marginLeft: 2}}>
-          Search User
-        </Button>
-        <Button variant="outlined" onClick={(e)=>setShowAuditLog(!showAuditLog)} sx={{ marginBottom: 2 , marginLeft: 2}}>
-          Audit Logs
-        </Button>
-        { showCreateUser ? <CreateUser/> : null}
-        { showSearchUser ? <UserSearch/> : null}
-        { showAuditLog ? <AuditLogs/> : null}
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth"
+          sx={{ marginBottom: 4 }}
+        >
+          <Tab label="Create User" />
+          <Tab label="Search User" />
+          <Tab label="Audit Logs" />
+        </Tabs>
+
+        {/* Tab Content */}
+        {activeTab === 0 && (
+          <Box>
+            <CreateUser />
+          </Box>
+        )}
+        {activeTab === 1 && (
+          <Box>
+            <UserSearch />
+          </Box>
+        )}
+        {activeTab === 2 && (
+          <Box>
+            <AuditLogs />
+          </Box>
+        )}
       </Box>
     </>
   );

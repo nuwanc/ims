@@ -1,17 +1,23 @@
 import React, { useState } from 'react';
-import { Box, Button, Typography, AppBar, Toolbar } from '@mui/material';
+import { Box, Button, Typography, AppBar, Toolbar, Tab, Tabs } from '@mui/material';
 import SearchReports from '../SearchReports';
 import ManageInvoices from '../ManageInvoices';
 
-const FinanceDashboard = ()=> {
-    const handleLogout = () => {
-        localStorage.clear(); // Clear token and role
-        window.location.href = '/'; // Redirect to login page
-    };
+const FinanceDashboard = () => {
+  const handleLogout = () => {
+    localStorage.clear(); // Clear token and role
+    window.location.href = '/'; // Redirect to login page
+  };
+
+  const [activeTab, setActiveTab] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setActiveTab(newValue);
+  };
 
 
-    return (
-        <>
+  return (
+    <>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -33,11 +39,32 @@ const FinanceDashboard = ()=> {
         <Typography variant="h4" gutterBottom>
           Finance Dashboard
         </Typography>
-        <SearchReports/>
-        <ManageInvoices/>
+        <Tabs
+          value={activeTab}
+          onChange={handleTabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth"
+          sx={{ marginBottom: 4 }}
+        >
+          <Tab label="Search Reports" />
+          <Tab label="Manage Invoices" />
+        </Tabs>
+
+        {/* Tab Content */}
+        {activeTab === 0 && (
+          <Box>
+            <SearchReports />
+          </Box>
+        )}
+        {activeTab === 1 && (
+          <Box>
+            <ManageInvoices />
+          </Box>
+        )}
       </Box>
-      </>
-    );
+    </>
+  );
 
 };
 
