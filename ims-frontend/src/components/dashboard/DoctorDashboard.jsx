@@ -37,7 +37,7 @@ const DoctorDashboard = () => {
         {!selectedPatient ? (
           <PatientSearch onSelectPatient={setSelectedPatient} />
         ) : (
-          <DoctorViewReports patient={selectedPatient} />
+          <DoctorViewReports patient={selectedPatient} onSelectPatient={setSelectedPatient}/>
         )}
       </Box>
     </>

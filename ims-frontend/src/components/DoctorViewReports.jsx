@@ -14,7 +14,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-const DoctorViewReports = ({ patient }) => {
+const DoctorViewReports = ({ patient, onSelectPatient }) => {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -37,12 +37,19 @@ const DoctorViewReports = ({ patient }) => {
     navigate(`/report-details/${reportId}`);
   };
 
+  const handleBackToReport = () => {
+    onSelectPatient(null);
+}
+
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h4" gutterBottom>
         Diagnostic Reports for {patient.email}
       </Typography>
       {error && <Typography color="error">{error}</Typography>}
+      <Button variant="outlined" onClick={handleBackToReport} sx={{ marginBottom: 2 }}>
+          Back to Search
+      </Button>
       {reports.length === 0 ? (
         <Typography>No reports found</Typography>
       ) : (

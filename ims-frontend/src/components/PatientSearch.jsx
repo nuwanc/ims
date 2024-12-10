@@ -28,7 +28,7 @@ const PatientSearch = ({ onSelectPatient }) => {
       <Button variant="contained" color="primary" onClick={searchPatients}>
         Search
       </Button>
-      <List sx={{ marginTop: 2 }}>
+      <List sx={{ marginTop: 2 }}>                
         { patients.length === 0 ? 
           (<Typography>No users found</Typography>) :
         patients.map((patient) => (
