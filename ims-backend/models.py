@@ -29,3 +29,13 @@ class DiagnosticImage(db.Model):
     data = db.Column(db.LargeBinary, nullable=False)  # Store the encrypted image
     filename = db.Column(db.String(200), nullable=False)  # Original filename
     uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class AuditLog(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=True)  # Nullable for system-level actions
+    action = db.Column(db.String(255), nullable=False)  # E.g., "INSERT", "DELETE"
+    table_name = db.Column(db.String(255), nullable=False)
+    record_id = db.Column(db.Integer, nullable=True)  # ID of the affected record
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    details = db.Column(db.Text, nullable=True)  # JSON or textual details about the action
+

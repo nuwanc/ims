@@ -4,8 +4,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, get_jwt_identity
 from flask_cors import CORS
 from sqlalchemy import not_
-from models import db, User, DiagnosticReport, DiagnosticImage
+from models import db, User, DiagnosticReport, DiagnosticImage, AuditLog
 from utils import hash_password, check_password, encrypt_data, decrypt_data
+from audit_utils import log_audit_action
 import os
 from werkzeug.utils import secure_filename
 from flask_migrate import Migrate
@@ -57,6 +58,14 @@ def login():
     if user and check_password(data.get('password'), user.password):
         # Pass the user object to `create_access_token`
         token = create_access_token(identity=user)
+        # audit login
+        log_audit_action(
+            user_id=user.id,  # user who performed the action
+            action="LOGIN",
+            table_name="users",
+            record_id=user.id,
+            details={"role": user.role, "email": user.email }
+        )
         return jsonify({'token': token, 'role': user.role}), 200
     return jsonify({'message': 'Invalid credentials'}), 401
 
@@ -75,6 +84,15 @@ def create_user():
     user = User(email=data['email'], password=hashed_password, role=data['role'])
     db.session.add(user)
     db.session.commit()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # Admin who performed the action
+        action="INSERT",
+        table_name="users",
+        record_id=user.id,
+        details={"email": data['email'], "role": data['role']}
+    )
     return jsonify({'message': 'User created successfully'}), 201
 
 
@@ -87,8 +105,7 @@ def list_users():
     if claims.get('role') != 'admin':
         return jsonify({'message': 'Unauthorized'}), 403
     
-        # Get query parameters
-    role = request.args.get('role')
+    # Get query parameters
     query = request.args.get('query', '').lower()  # Default to an empty string
     
     # Query the database
@@ -101,6 +118,15 @@ def list_users():
             (User.email.ilike(f"%{query}%")) | (User.id.ilike(f"%{query}%"))
         ) 
         users = users_query.all()
+    
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # Admin who performed the action
+        action="SEARCH",
+        table_name="users",
+        record_id=0,
+        details={"query":query,"count":len(users)}
+    )
 
     return jsonify([{'id': u.id, 'email': u.email, 'role': u.role} for u in users])
 
@@ -125,6 +151,16 @@ def get_users():
         )
 
     users = users_query.all()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # user who performed the action
+        action="SEARCH",
+        table_name="users",
+        record_id=0,
+        details={"query":query,"count":len(users)}
+    )
+
     return jsonify([
         {'id': user.id, 'email': user.email, 'role': user.role}
         for user in users
@@ -160,6 +196,14 @@ def delete_user(user_id):
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # Admin who performed the action
+        action="DELETE",
+        table_name="users",
+        record_id=user_id,
+        details={"user":user_id,"action":"Delete user from system."}
+    )
     return jsonify({'message': 'User deleted successfully'})
 
 
@@ -190,6 +234,16 @@ def create_diagnostic_report():
     )
     db.session.add(report)
     db.session.commit()
+
+        # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="INSERT",
+        table_name="reports",
+        record_id=report.id,
+        details={"type":report_type,"description":description,"patient":patient_id}
+    )
+    
     return jsonify({'message': 'Diagnostic report created', 'report_id': report.id}), 201
 
 @app.route('/diagnostic-reports/<int:report_id>/images', methods=['POST'])
@@ -365,6 +419,27 @@ def add_report_comment(report_id):
 
     return jsonify({'message': 'Comment added successfully'}), 200
 
+@app.route('/audit-logs', methods=['GET'])
+@jwt_required()
+def get_audit_logs():
+    claims = get_jwt()
+    if claims.get('role') != 'admin':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).all()
+    log_data = [
+        {
+            'id': log.id,
+            'user_id': log.user_id,
+            'action': log.action,
+            'table_name': log.table_name,
+            'record_id': log.record_id,
+            'timestamp': log.timestamp,
+            'details': log.details,
+        }
+        for log in logs
+    ]
+    return jsonify(log_data), 200
 
 
 
