@@ -3,6 +3,7 @@ import { Box, Typography, Grid, Paper, Button, AppBar, Toolbar, TextField } from
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import ImageViewer from './ImageViewer';
+import UploadImages from './UploadImages';
 
 const ReportDetails = () => {
     const { reportId } = useParams(); // Retrieve report ID from route params
@@ -173,8 +174,10 @@ const ReportDetails = () => {
                         <Typography variant="h5" sx={{ marginTop: 3, marginBottom: 2 }}>
                             Attached Images
                         </Typography>
-                        {images.length === 0 ? (
+                        {images.length === 0 ? (<>
                             <Typography>No images found</Typography>
+                            {role === 'medical_staff' ? <UploadImages reportId={reportId} /> : null}
+                            </>
                         ) : (
                             <Grid container spacing={2}>
                                 {images.map((image) => (

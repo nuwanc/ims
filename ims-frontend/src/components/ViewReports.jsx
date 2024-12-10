@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
-const ViewReports = ({ patient }) => {
+const ViewReports = ({ patient, onSelectPatient }) => {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -37,8 +37,11 @@ const ViewReports = ({ patient }) => {
         <Typography variant="h4" gutterBottom>
             Diagnostic Reports for {patient.email}
         </Typography>
-        <Button variant="outlined" onClick={handleRefreshReport} sx={{ marginBottom: 2 }}>
+        <Button variant="outlined" onClick={handleRefreshReport} sx={{ marginBottom: 2, marginLeft: 2 }}>
              Refresh
+        </Button>
+        <Button variant="outlined" onClick={(e)=>onSelectPatient(null)} sx={{ marginBottom: 2, marginLeft: 2 }}>
+             Bakc to Search
         </Button>
         {error && <Typography color="error">{error}</Typography>}
         {reports.length === 0 ? (

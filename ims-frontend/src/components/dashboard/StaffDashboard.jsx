@@ -35,7 +35,7 @@ const StaffDashboard = () => {
                 </Toolbar>
             </AppBar>
             <Box sx={{ padding: 4 }}>
-                {!selectedPatient ? (<PatientSearch onSelectPatient={setSelectedPatient} />) : selectedPatient ? (<ViewReports patient={selectedPatient} />) : null}
+                {!selectedPatient ? (<PatientSearch onSelectPatient={setSelectedPatient} />) : selectedPatient ? (<ViewReports patient={selectedPatient} onSelectPatient={setSelectedPatient}/>) : null}
                 {!createdReportId && selectedPatient ? (<DiagnosticReportForm patient={selectedPatient} onReportCreated={setCreatedReportId} />) : null}
                 { createdReportId ? (<UploadImages reportId={createdReportId} />) : null}
             </Box>
