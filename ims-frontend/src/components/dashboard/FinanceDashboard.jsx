@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, AppBar, Toolbar } from '@mui/material';
-import PatientSearch from '../PatientSearch';
-import DoctorViewReports from '../DoctorViewReports';
+import SearchReports from '../SearchReports';
+import ManageInvoices from '../ManageInvoices';
 
-const DoctorDashboard = () => {
-  const [selectedPatient, setSelectedPatient] = useState(null);
+const FinanceDashboard = ()=> {
+    const handleLogout = () => {
+        localStorage.clear(); // Clear token and role
+        window.location.href = '/'; // Redirect to login page
+    };
 
-  const handleLogout = () => {
-    localStorage.clear(); // Clear token and role
-    window.location.href = '/'; // Redirect to login page
-  };
 
-  return (
-    <>
+    return (
+        <>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
@@ -32,16 +31,14 @@ const DoctorDashboard = () => {
       </AppBar>
       <Box sx={{ padding: 4 }}>
         <Typography variant="h4" gutterBottom>
-          Doctor Dashboard
+          Finance Dashboard
         </Typography>
-        {!selectedPatient ? (
-          <PatientSearch onSelectPatient={setSelectedPatient} />
-        ) : (
-          <DoctorViewReports patient={selectedPatient} onSelectPatient={setSelectedPatient}/>
-        )}
+        <SearchReports/>
+        <ManageInvoices/>
       </Box>
-    </>
-  );
+      </>
+    );
+
 };
 
-export default DoctorDashboard;
+export default FinanceDashboard;

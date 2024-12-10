@@ -34,6 +34,7 @@ const Login = () => {
       else if (role === 'medical_staff') navigate('/medical-staff-dashboard');
       else if (role === 'doctor') navigate('/doctor-dashboard');
       else if (role === 'patient') navigate('/patient-dashboard');
+      else if (role === 'finance_staff') navigate('/finance-dashboard');
       else throw new Error('Invalid role');
     } catch (err) {
       setError('Invalid credentials');

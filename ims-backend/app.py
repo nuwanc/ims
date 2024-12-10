@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt, get_jwt_identity
 from flask_cors import CORS
 from sqlalchemy import not_
-from models import db, User, DiagnosticReport, DiagnosticImage, AuditLog
+from models import db, User, DiagnosticReport, DiagnosticImage, AuditLog, Invoice
 from utils import hash_password, check_password, encrypt_data, decrypt_data
 from audit_utils import log_audit_action
 import os
@@ -13,7 +13,7 @@ from flask_migrate import Migrate
 
 app = Flask(__name__)
 # Configure CORS for the app with specific headers and methods
-CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "OPTIONS", "DELETE"], supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "OPTIONS", "DELETE", "PATCH"], supports_credentials=True)
 
 # Configurations
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
@@ -441,6 +441,121 @@ def get_audit_logs():
     ]
     return jsonify(log_data), 200
 
+
+@app.route('/reports/search', methods=['GET'])
+@jwt_required()
+def search_reports():
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    report_type = request.args.get('type')
+    patient_email = request.args.get('patient_email')
+
+    query = DiagnosticReport.query.outerjoin(Invoice, DiagnosticReport.id == Invoice.report_id)
+    query = query.filter(Invoice.id.is_(None))  # Exclude reports with invoices
+
+    if report_type:
+        query = query.filter(DiagnosticReport.type == report_type)
+    if patient_email:
+        patient = User.query.filter_by(email=patient_email, role='patient').first()
+        if not patient:
+            return jsonify({'message': 'Patient not found'}), 404
+        query = query.filter(DiagnosticReport.patient_id == patient.id)
+
+    reports = query.all()
+    return jsonify([
+        {
+            'id': report.id,
+            'type': report.type,
+            'description': report.description,
+            'created_at': report.created_at,
+        }
+        for report in reports
+    ])
+
+@app.route('/invoices', methods=['POST'])
+@jwt_required()
+def create_invoice():
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    data = request.json
+    report_id = data.get('report_id')
+    cost = data.get('cost')
+
+    report = DiagnosticReport.query.get_or_404(report_id)
+
+    invoice = Invoice(
+        report_id=report.id,
+        patient_id=report.patient_id,
+        generated_by=get_jwt_identity(),
+        cost=cost,
+        status="Unpaid",
+    )
+    db.session.add(invoice)
+    db.session.commit()
+
+    return jsonify({'message': 'Invoice created successfully', 'invoice_id': invoice.id}), 201
+
+
+@app.route('/invoices/filter', methods=['GET'])
+@jwt_required()
+def get_invoices():
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    status = request.args.get('status')  # "Paid" or "Unpaid"
+
+    query = Invoice.query
+    if status:
+        query = query.filter(Invoice.status == status)
+
+    invoices = query.all()
+    return jsonify([
+        {
+            'id': invoice.id,
+            'report_id': invoice.report_id,
+            'patient_id': invoice.patient_id,
+            'cost': invoice.cost,
+            'status': invoice.status,
+            'generated_by': invoice.generated_by,
+            'created_at': invoice.created_at,
+        }
+        for invoice in invoices
+    ])
+
+
+@app.route('/invoices/<int:invoice_id>/pay', methods=['PATCH'])
+@jwt_required()
+def mark_invoice_paid(invoice_id):
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    invoice = Invoice.query.get_or_404(invoice_id)
+    if invoice.status == "Paid":
+        return jsonify({'message': 'Invoice is already marked as paid'}), 400
+
+    invoice.status = "Paid"
+    db.session.commit()
+
+    return jsonify({'message': 'Invoice marked as paid successfully'}), 200
+
+
+@app.route('/patients/<int:patient_id>/total-cost', methods=['GET'])
+@jwt_required()
+def patient_total_cost(patient_id):
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    invoices = Invoice.query.filter_by(patient_id=patient_id, status="Paid").all()
+    total_cost = sum(invoice.cost for invoice in invoices)
+
+    return jsonify({'patient_id': patient_id, 'total_cost': total_cost})
 
 
 if __name__ == '__main__':

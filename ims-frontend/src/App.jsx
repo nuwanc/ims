@@ -7,6 +7,7 @@ import AdminDashboard from './components/dashboard/AdminDashboard';
 import PatientDashboard from './components/dashboard/PatientDashboard';
 import ReportDetails from './components/ReportDetails';
 import StaffDashboard from './components/dashboard/StaffDashboard';
+import FinanceDashboard from './components/dashboard/FinanceDashboard';
 
 const App = () => {
   return (
@@ -38,6 +39,15 @@ const App = () => {
           element={
             <ProtectedRoute allowedRoles={['doctor']}>
               <DoctorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/finance-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={['finance_staff']}>
+              <FinanceDashboard />
             </ProtectedRoute>
           }
         />
