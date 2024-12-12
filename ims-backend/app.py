@@ -182,6 +182,14 @@ def update_user(user_id):
         user.password = hash_password(data['password'])
     user.role = data.get('role', user.role)
     db.session.commit()
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # user who performed the action
+        action="SEARCH",
+        table_name="users",
+        record_id=user_id,
+        details={"email":data['email'],"role":data['role']}
+    )
     return jsonify({'message': 'User updated successfully'})
 
 # Delete User (Admin Only)
@@ -235,7 +243,7 @@ def create_diagnostic_report():
     db.session.add(report)
     db.session.commit()
 
-        # Log the action
+    # Log the action
     log_audit_action(
         user_id=get_jwt_identity(),  # User who performed the action
         action="INSERT",
@@ -277,6 +285,16 @@ def upload_diagnostic_images(report_id):
             uploaded_files.append(filename)
 
     db.session.commit()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="INSERT",
+        table_name="images",
+        record_id=report.id,
+        details={"files":uploaded_files}
+    )
+
     return jsonify({'message': 'Images uploaded successfully', 'uploaded_files': uploaded_files}), 201
 
 @app.route('/diagnostic-reports/images/<int:image_id>', methods=['GET'])
@@ -292,13 +310,18 @@ def get_diagnostic_image(image_id):
 
     # Role-based access control
     if role == 'patient' and int(report.patient_id) != int(user_id):
-        print('11')
         return jsonify({'message': 'Unauthorized'}), 403
     if role not in ['patient', 'medical_staff', 'doctor']:
-        print('22')
         return jsonify({'message': 'Unauthorized'}), 403
     
-    print('here')
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="VIEW",
+        table_name="images",
+        record_id=report.id,
+        details={"file":diagnostic_image.filename,"report":diagnostic_image.report_id}
+    )
 
     # Decrypt and return the image
     decrypted_data = decrypt_data(diagnostic_image.data)
@@ -329,6 +352,15 @@ def list_diagnostic_reports(patient_id):
             'images': [{'id': img.id, 'filename': img.filename} for img in images]
         })
 
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="VIEW",
+        table_name="reports",
+        record_id=patient_id,
+        details={"reports":len(result)}
+    )
+
     return jsonify(result)
 
 @app.route('/my-diagnostic-reports', methods=['GET'])
@@ -351,6 +383,15 @@ def get_my_diagnostic_reports():
             'created_at': report.created_at,
             'images': [{'id': img.id, 'filename': img.filename} for img in images]
         })
+    
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="VIEW",
+        table_name="reports",
+        record_id=patient_id,
+        details={"reports":len(result)}
+    )
 
     return jsonify(result)
 
@@ -393,6 +434,15 @@ def get_report_details(report_id):
         'images': image_data,
     }
 
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="VIEW",
+        table_name="reports",
+        record_id=report.id,
+        details={"patient":user_id,"report":report_id}
+    )
+
     return jsonify(response), 200
 
 
@@ -416,6 +466,16 @@ def add_report_comment(report_id):
     report.updated_by = user_id
     report.updated_at = datetime.utcnow()
     db.session.commit()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="ADD-COMMENT",
+        table_name="reports",
+        record_id=report.id,
+        details={"comment":comment,"diagnosis":diagnosis}
+    )
+
 
     return jsonify({'message': 'Comment added successfully'}), 200
 
@@ -464,6 +524,17 @@ def search_reports():
         query = query.filter(DiagnosticReport.patient_id == patient.id)
 
     reports = query.all()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="SEARCH",
+        table_name="reports",
+        record_id=0,
+        details={"type":report_type,"email":patient_email}
+    )
+
+
     return jsonify([
         {
             'id': report.id,
@@ -497,6 +568,16 @@ def create_invoice():
     db.session.add(invoice)
     db.session.commit()
 
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="CREATE",
+        table_name="invoice",
+        record_id=invoice.id,
+        details={"report":report_id,"cost":cost}
+    )
+
+
     return jsonify({'message': 'Invoice created successfully', 'invoice_id': invoice.id}), 201
 
 
@@ -514,6 +595,17 @@ def get_invoices():
         query = query.filter(Invoice.status == status)
 
     invoices = query.all()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="FILTER",
+        table_name="invoice",
+        record_id=0,
+        details={"invoices":len(invoices),"status":status}
+    )
+
+
     return jsonify([
         {
             'id': invoice.id,
@@ -541,6 +633,15 @@ def mark_invoice_paid(invoice_id):
 
     invoice.status = "Paid"
     db.session.commit()
+
+    # Log the action
+    log_audit_action(
+        user_id=get_jwt_identity(),  # User who performed the action
+        action="PAY",
+        table_name="invoice",
+        record_id=invoice.id,
+        details={"invoice":invoice.id,"status":"Paid"}
+    )
 
     return jsonify({'message': 'Invoice marked as paid successfully'}), 200
 

@@ -21,7 +21,7 @@ const UserManagement = () => {
     <>
       <Box sx={{ padding: 4 }}>
         <Typography variant="h4" gutterBottom>
-          User Management
+          Admin Dashboard
         </Typography>
         <Tabs
           value={activeTab}
