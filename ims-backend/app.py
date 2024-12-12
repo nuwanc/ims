@@ -646,7 +646,43 @@ def mark_invoice_paid(invoice_id):
     return jsonify({'message': 'Invoice marked as paid successfully'}), 200
 
 
+@app.route('/patients/total', methods=['GET'])
+@jwt_required()
+def get_total_patients():
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    total_patients = User.query.filter_by(role='patient').count()
+    return jsonify({'total_patients': total_patients})
+
+
+@app.route('/invoices/total-cost', methods=['GET'])
+@jwt_required()
+def get_total_cost():
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    total_cost = db.session.query(db.func.sum(Invoice.cost)).filter(Invoice.status == "Paid").scalar()
+    return jsonify({'total_cost': total_cost or 0})
+
+
 @app.route('/patients/<int:patient_id>/total-cost', methods=['GET'])
+@jwt_required()
+def get_patient_total_cost(patient_id):
+    claims = get_jwt()
+    if claims.get('role') != 'finance_staff':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    total_cost = db.session.query(db.func.sum(Invoice.cost)).filter(
+        Invoice.patient_id == patient_id, Invoice.status == "Paid"
+    ).scalar()
+
+    return jsonify({'patient_id': patient_id, 'total_cost': total_cost or 0})
+
+
+""" @app.route('/patients/<int:patient_id>/total-cost', methods=['GET'])
 @jwt_required()
 def patient_total_cost(patient_id):
     claims = get_jwt()
@@ -656,7 +692,7 @@ def patient_total_cost(patient_id):
     invoices = Invoice.query.filter_by(patient_id=patient_id, status="Paid").all()
     total_cost = sum(invoice.cost for invoice in invoices)
 
-    return jsonify({'patient_id': patient_id, 'total_cost': total_cost})
+    return jsonify({'patient_id': patient_id, 'total_cost': total_cost}) """
 
 
 if __name__ == '__main__':

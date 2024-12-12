@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Typography, AppBar, Toolbar, Tab, Tabs } from '@mui/material';
 import SearchReports from '../SearchReports';
 import ManageInvoices from '../ManageInvoices';
+import TotalPatientsAndCost from '../TotalPatientAndCost';
 
 const FinanceDashboard = () => {
   const handleLogout = () => {
@@ -49,6 +50,7 @@ const FinanceDashboard = () => {
         >
           <Tab label="Search Reports" />
           <Tab label="Manage Invoices" />
+          <Tab label="System Reports" />
         </Tabs>
 
         {/* Tab Content */}
@@ -60,6 +62,11 @@ const FinanceDashboard = () => {
         {activeTab === 1 && (
           <Box>
             <ManageInvoices />
+          </Box>
+        )}
+        {activeTab === 2 && (
+          <Box>
+            <TotalPatientsAndCost/>
           </Box>
         )}
       </Box>
