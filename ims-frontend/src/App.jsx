@@ -1,5 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import {
+  Box,
+  Typography
+} from '@mui/material';
 import Login from './components/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import DoctorDashboard from './components/dashboard/DoctorDashboard';
@@ -8,6 +12,18 @@ import PatientDashboard from './components/dashboard/PatientDashboard';
 import ReportDetails from './components/ReportDetails';
 import StaffDashboard from './components/dashboard/StaffDashboard';
 import FinanceDashboard from './components/dashboard/FinanceDashboard';
+
+const NotFound = () => (
+  <Box sx={{ textAlign: 'center', padding: 4 }}>
+    <Typography variant="h4" color="error">
+      404 - Page Not Found
+    </Typography>
+    <Typography variant="body1">
+      Sorry, the page you are looking for does not exist.
+    </Typography>
+  </Box>
+);
+
 
 const App = () => {
   return (
@@ -69,6 +85,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
