@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Box, Button, Typography, AppBar, Toolbar } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
 import PatientSearch from '../PatientSearch';
 import DiagnosticReportForm from '../DiagnosticReportForm';
 import UploadImages from '../UploadImages';

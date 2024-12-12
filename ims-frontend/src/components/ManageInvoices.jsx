@@ -52,7 +52,7 @@ const ManageInvoices = () => {
 
   return (
     <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Manage Invoices
       </Typography>
       <Button variant="contained" color="primary" onClick={() => fetchInvoices('Unpaid')} sx={{ marginRight: 2 }}>

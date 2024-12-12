@@ -43,7 +43,7 @@ const DoctorViewReports = ({ patient, onSelectPatient }) => {
 
   return (
     <Box sx={{ padding: 4 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h5" gutterBottom>
         Diagnostic Reports for {patient.email}
       </Typography>
       {error && <Typography color="error">{error}</Typography>}

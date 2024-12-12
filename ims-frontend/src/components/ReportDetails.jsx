@@ -138,7 +138,7 @@ const ReportDetails = () => {
                 {error && <Typography color="error">{error}</Typography>}
                 {report && (
                     <>
-                        <Typography variant="h4" gutterBottom>
+                        <Typography variant="h5" gutterBottom>
                             Report Details: {report.type}
                         </Typography>
                         <Typography variant="body1" gutterBottom>

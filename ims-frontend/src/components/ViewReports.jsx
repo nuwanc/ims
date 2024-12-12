@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Typography, AppBar, Toolbar } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +34,7 @@ const ViewReports = ({ patient, onSelectPatient }) => {
   return (
     <>
       <Box sx={{ padding: 4 }}>
-        <Typography variant="h4" gutterBottom>
+        <Typography variant="h5" gutterBottom>
             Diagnostic Reports for {patient.email}
         </Typography>
         <Button variant="outlined" onClick={handleRefreshReport} sx={{ marginBottom: 2, marginLeft: 2 }}>
