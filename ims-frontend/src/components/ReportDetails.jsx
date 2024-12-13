@@ -20,7 +20,7 @@ const ReportDetails = () => {
     useEffect(() => {
         const fetchReportDetails = async () => {
             try {
-                const response = await api.get(`/my-diagnostic-reports/${reportId}`);
+                const response = await api.get(`/report/my-diagnostic-reports/${reportId}`);
                 setReport(response.data.report);
                 setImages(response.data.images);
             } catch (err) {
@@ -40,7 +40,7 @@ const ReportDetails = () => {
     const handleCommentSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post(`/diagnostic-reports/${report.id}/add-comment`, {
+            await api.post(`/report/diagnostic-reports/${report.id}/add-comment`, {
                 diagnosis,
                 comment,
             });

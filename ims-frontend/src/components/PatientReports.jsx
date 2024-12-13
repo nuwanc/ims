@@ -12,7 +12,7 @@ const PatientReports = () => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const response = await api.get('/my-diagnostic-reports');
+                const response = await api.get('/report/my-diagnostic-reports');
                 setReports(response.data);
             } catch (err) {
                 setError('Error fetching reports');
@@ -24,7 +24,7 @@ const PatientReports = () => {
     }, []);
 
     const viewReportDetails = (reportId) => {
-        navigate(`/report-details/${reportId}`);
+        navigate(`/report/report-details/${reportId}`);
     };
 
 

@@ -25,7 +25,7 @@ const CreateUser = () => {
     setError('');
     setLoading(true);
     try {
-      await api.post('/users', { email, password, role });
+      await api.post('/user/create', { email, password, role });
       setSuccess('User Creation Successful.');
     } catch (err) {
       setError('Error creating user. Please try again.');

@@ -10,7 +10,7 @@ const UserSearch = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await api.get('/users');
+        const response = await api.get('/user/users');
         setUsers(response.data);
       } catch (err) {
         setError('Error fetching users');
@@ -23,7 +23,7 @@ const UserSearch = () => {
 
   const searchUsers = async () => {
     try {
-      const response = await api.get('/users', { params: { role: 'admin', query } });
+      const response = await api.get('/user/users', { params: { role: 'admin', query } });
       setUsers(response.data);
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -33,7 +33,7 @@ const UserSearch = () => {
   const deleteUser = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await api.delete(`/users/${id}`);
+        await api.delete(`user/${id}`);
         setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id)); // Update state after deletion
       } catch (err) {
         setError('Error deleting user');

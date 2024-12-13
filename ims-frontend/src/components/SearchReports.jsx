@@ -39,7 +39,7 @@ const SearchReports = () => {
     setSuccess('');
     setLoading(true);
     try {
-      const response = await api.get('/reports/search', {
+      const response = await api.get('/report/search', {
         params: { type: reportType, patient_email: patientEmail },
       });
       setReports(response.data);
@@ -71,7 +71,7 @@ const SearchReports = () => {
     setSuccess('');
     setLoading(true);
     try {
-      await api.post('/invoices', { report_id: selectedReportId, cost: Number(price) });
+      await api.post('/invoice/create', { report_id: selectedReportId, cost: Number(price) });
       setSuccess(`Invoice generated successfully for Report ID: ${selectedReportId}`);
       closeInvoiceModal();
     } catch (err) {

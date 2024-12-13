@@ -22,7 +22,7 @@ const DoctorViewReports = ({ patient, onSelectPatient }) => {
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await api.get(`/patients/${patient.id}/diagnostic-reports`);
+        const response = await api.get(`/report/patients/${patient.id}/diagnostic-reports`);
         setReports(response.data);
       } catch (err) {
         setError('Error fetching reports');
@@ -34,7 +34,7 @@ const DoctorViewReports = ({ patient, onSelectPatient }) => {
   }, [patient.id]);
 
   const viewReportDetails = (reportId) => {
-    navigate(`/report-details/${reportId}`);
+    navigate(`/report/report-details/${reportId}`);
   };
 
   const handleBackToReport = () => {

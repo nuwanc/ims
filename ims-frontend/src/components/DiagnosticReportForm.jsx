@@ -21,7 +21,7 @@ const DiagnosticReportForm = ({ patient, onReportCreated }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await api.post('/diagnostic-reports', {
+      const response = await api.post('/report/diagnostic-reports', {
         patient_id: patient.id,
         type,
         description,

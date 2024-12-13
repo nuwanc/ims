@@ -29,7 +29,7 @@ const UploadImages = ({ reportId }) => {
     setUploading(true);
 
     try {
-      await api.post(`/diagnostic-reports/${reportId}/images`, formData, {
+      await api.post(`/report/diagnostic-reports/${reportId}/images`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

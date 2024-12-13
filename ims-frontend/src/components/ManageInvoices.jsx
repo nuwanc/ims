@@ -25,7 +25,7 @@ const ManageInvoices = () => {
     setError('');
     setSuccess('');
     try {
-      const response = await api.get('/invoices/filter', { params: { status } });
+      const response = await api.get('/invoice/filter', { params: { status } });
       setInvoices(response.data);
     } catch (err) {
       setError('Error fetching invoices. Please try again.');
@@ -38,7 +38,7 @@ const ManageInvoices = () => {
     setError('');
     setSuccess('');
     try {
-      await api.patch(`/invoices/${invoiceId}/pay`);
+      await api.patch(`/invoice/${invoiceId}/pay`);
       setSuccess(`Invoice ${invoiceId} marked as paid.`);
       fetchInvoices('Unpaid'); // Refresh the unpaid invoices
     } catch (err) {

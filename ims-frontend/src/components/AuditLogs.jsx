@@ -31,7 +31,7 @@ const AuditLogs = () => {
       setLoading(true);
       setError('');
       try {
-        const response = await api.get('/audit-logs');
+        const response = await api.get('/audit/logs');
         setLogs(response.data);
       } catch (err) {
         setError('Error fetching audit logs. Please try again.');

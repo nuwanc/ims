@@ -20,7 +20,7 @@ const TotalPatientsAndCost = () => {
   useEffect(() => {
     const fetchTotalPatients = async () => {
       try {
-        const response = await api.get('/patients/total');
+        const response = await api.get('/stats/patients/total');
         setTotalPatients(response.data.total_patients);
       } catch (err) {
         setError('Error fetching total number of patients.');
@@ -29,7 +29,7 @@ const TotalPatientsAndCost = () => {
 
     const fetchTotalCost = async () => {
       try {
-        const response = await api.get('/invoices/total-cost');
+        const response = await api.get('/stats/invoices/cost');
         setTotalCost(response.data.total_cost);
       } catch (err) {
         setError('Error fetching total cost.');
@@ -50,7 +50,7 @@ const TotalPatientsAndCost = () => {
     setSelectedPatientCost(null);
     setLoading(true);
     try {
-      const response = await api.get(`/patients/${selectedPatientId}/total-cost`);
+      const response = await api.get(`/stats/${selectedPatientId}/cost`);
       setSelectedPatientCost(response.data.total_cost);
     } catch (err) {
       setError('Error fetching total cost for the selected patient.');

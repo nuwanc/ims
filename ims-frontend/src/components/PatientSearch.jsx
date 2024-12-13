@@ -8,7 +8,7 @@ const PatientSearch = ({ onSelectPatient }) => {
 
   const searchPatients = async () => {
     try {
-      const response = await api.get('/patients', { params: { role: 'patient', query } });
+      const response = await api.get('/user/patients', { params: { role: 'patient', query } });
       setPatients(response.data);
     } catch (err) {
       console.error('Error fetching patients:', err);

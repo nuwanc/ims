@@ -7,7 +7,7 @@ const ImageViewer = ({ imageId }) => {
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const response = await api.get(`/diagnostic-reports/images/${imageId}`, {
+        const response = await api.get(`/report/diagnostic-reports/images/${imageId}`, {
           responseType: 'blob', // Ensure we get the binary data
         });
         const imageUrl = URL.createObjectURL(response.data); // Convert blob to object URL
