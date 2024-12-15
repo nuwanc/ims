@@ -27,6 +27,7 @@ const DiagnosticReportForm = ({ patient, onReportCreated }) => {
         description,
       });
       onReportCreated(response.data.report_id); // Pass the report ID to the parent
+      setDescription('');
     } catch (err) {
       setError('Error creating diagnostic report');
       console.error(err);

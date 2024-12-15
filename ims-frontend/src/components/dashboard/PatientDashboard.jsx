@@ -1,4 +1,4 @@
-import React from 'react';  
+import React from 'react';
 import { Box, Button, Typography, AppBar, Toolbar } from '@mui/material';
 import PatientReports from '../PatientReports';
 
@@ -17,7 +17,9 @@ const PatientDashboard = () => {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         IMS
                     </Typography>
-
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography component="div" sx={{ flexGrow: 1 }}>Logged in as {localStorage.getItem('email')}</Typography>
+                    </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Button
                             color="inherit"
@@ -29,7 +31,7 @@ const PatientDashboard = () => {
                     </Box>
                 </Toolbar>
             </AppBar>
-            <PatientReports/>
+            <PatientReports />
         </>
     );
 };

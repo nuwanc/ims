@@ -24,10 +24,11 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await api.post('/auth/login', { email, password });
-      const { token, role } = response.data;
+      const { token, role} = response.data;
 
       localStorage.setItem('token', token);
       localStorage.setItem('role', role);
+      localStorage.setItem('email',email);
 
       // Redirect based on role
       if (role === 'admin') navigate('/admin-dashboard');

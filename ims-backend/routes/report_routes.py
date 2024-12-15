@@ -9,6 +9,7 @@ from utils.encryption_utils import encrypt_data, decrypt_data
 from utils.audit_utils import log_audit_action
 from werkzeug.utils import secure_filename
 from datetime import datetime
+from sqlalchemy import desc
 
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 def allowed_file(filename):
@@ -21,7 +22,8 @@ report_routes = Blueprint("report_routes", __name__)
 @jwt_required()
 def create_diagnostic_report():
     claims = get_jwt()
-    if claims.get('role') != 'medical_staff':
+
+    if claims.get('role') not in ['medical_staff', 'doctor']:
         return jsonify({'message': 'Unauthorized'}), 403
 
     data = request.json
@@ -141,7 +143,7 @@ def list_diagnostic_reports(patient_id):
     if claims.get('role') not in ['medical_staff', 'doctor']:
         return jsonify({'message': 'Unauthorized'}), 403
 
-    reports = DiagnosticReport.query.filter_by(patient_id=patient_id).all()
+    reports = DiagnosticReport.query.filter_by(patient_id=patient_id).order_by(desc(DiagnosticReport.created_at)).all()
     result = []
     for report in reports:
         images = DiagnosticImage.query.filter_by(report_id=report.id).all()

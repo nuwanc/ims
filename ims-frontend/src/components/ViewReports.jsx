@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Button, Typography } from '@mui/material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,Chip } from '@mui/material';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -71,6 +71,7 @@ const ViewReports = ({ patient, onSelectPatient }) => {
                       >
                         View Details
                       </Button>
+                      {report.images.length === 0 ? <Chip label="New" color="success" />: null}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -21,7 +21,9 @@ const StaffDashboard = () => {
                     <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
                         IMS
                     </Typography>
-
+                    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <Typography component="div" sx={{ flexGrow: 1 }}>Logged in as {localStorage.getItem('email')}</Typography>
+                    </Box>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
                         <Button
                             color="inherit"
@@ -34,9 +36,9 @@ const StaffDashboard = () => {
                 </Toolbar>
             </AppBar>
             <Box sx={{ padding: 4 }}>
-                {!selectedPatient ? (<PatientSearch onSelectPatient={setSelectedPatient} />) : selectedPatient ? (<ViewReports patient={selectedPatient} onSelectPatient={setSelectedPatient}/>) : null}
+                {!selectedPatient ? (<PatientSearch onSelectPatient={setSelectedPatient} />) : selectedPatient ? (<ViewReports patient={selectedPatient} onSelectPatient={setSelectedPatient} />) : null}
                 {!createdReportId && selectedPatient ? (<DiagnosticReportForm patient={selectedPatient} onReportCreated={setCreatedReportId} />) : null}
-                { createdReportId ? (<UploadImages reportId={createdReportId} />) : null}
+                {createdReportId ? (<UploadImages reportId={createdReportId} />) : null}
             </Box>
         </>
     )

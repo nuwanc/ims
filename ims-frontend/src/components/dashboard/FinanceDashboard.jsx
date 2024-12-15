@@ -24,7 +24,9 @@ const FinanceDashboard = () => {
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             IMS
           </Typography>
-
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+            <Typography component="div" sx={{ flexGrow: 1 }}>Logged in as {localStorage.getItem('email')}</Typography>
+          </Box>
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
             <Button
               color="inherit"
@@ -66,7 +68,7 @@ const FinanceDashboard = () => {
         )}
         {activeTab === 2 && (
           <Box>
-            <TotalPatientsAndCost/>
+            <TotalPatientsAndCost />
           </Box>
         )}
       </Box>

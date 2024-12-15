@@ -14,7 +14,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
-const DoctorViewReports = ({ patient, onSelectPatient }) => {
+const DoctorViewReports = ({ patient, onSelectPatient, createdReportId }) => {
   const [reports, setReports] = useState([]);
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -31,7 +31,7 @@ const DoctorViewReports = ({ patient, onSelectPatient }) => {
     };
 
     fetchReports();
-  }, [patient.id]);
+  }, [patient.id, createdReportId]);
 
   const viewReportDetails = (reportId) => {
     navigate(`/report/report-details/${reportId}`);
