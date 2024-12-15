@@ -110,7 +110,7 @@ def delete_user(user_id):
 @jwt_required()
 def get_users():
     claims = get_jwt()
-    if claims.get('role') not in ['admin', 'medical_staff','doctor']:
+    if claims.get('role') not in ['admin', 'medical_staff','doctor', 'finance_staff']:
         return jsonify({'message': 'Unauthorized'}), 403
 
     # Get query parameters

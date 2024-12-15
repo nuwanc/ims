@@ -28,7 +28,7 @@ api.interceptors.response.use(
       const { status } = error.response;
 
       // Handle 401 Unauthorized or 403 Forbidden
-      if (status === 401 || status === 403) {
+      if ( status === 403) {
         alert('Your session has expired or you do not have access. Please log in again.');
 
         // Clear user data from localStorage
