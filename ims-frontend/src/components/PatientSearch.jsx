@@ -32,7 +32,7 @@ const PatientSearch = ({ onSelectPatient }) => {
         { patients.length === 0 ? 
           (<Typography>No users found</Typography>) :
         patients.map((patient) => (
-          <ListItem key={patient.id} button="true" onClick={() => {onSelectPatient(patient);setPatients([])}}>
+          <ListItem key={patient.id} button="true" onClick={() => {onSelectPatient(patient);}}>
             <ListItemText primary={patient.email} secondary={`Role: ${patient.role}`} />
           </ListItem>
         ))}

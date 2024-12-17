@@ -13,19 +13,21 @@ import {
   Alert,
 } from '@mui/material';
 import api from '../services/api';
+import PatientSearch from './PatientSearch';
 
 const ManageInvoices = () => {
   const [invoices, setInvoices] = useState([]);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState(null);
 
   const fetchInvoices = async (status) => {
     setLoading(true);
     setError('');
     setSuccess('');
     try {
-      const response = await api.get('/invoice/filter', { params: { status } });
+      const response = await api.get(`/invoice/filter/${selectedPatient.id}`, { params: { status } });
       setInvoices(response.data);
     } catch (err) {
       setError('Error fetching invoices. Please try again.');
@@ -48,58 +50,60 @@ const ManageInvoices = () => {
 
   useEffect(() => {
     fetchInvoices('Unpaid');
-  }, []);
+  }, [selectedPatient]);
 
   return (
     <Box sx={{ padding: 4 }}>
       <Typography variant="h5" gutterBottom>
-        Manage Invoices
+        Manage Invoices {selectedPatient!= null ? selectedPatient.email : null}
       </Typography>
-      <Button variant="contained" color="primary" onClick={() => fetchInvoices('Unpaid')} sx={{ marginRight: 2 }}>
+      <PatientSearch onSelectPatient={setSelectedPatient} />
+      {selectedPatient ? (<><Button variant="contained" color="primary" onClick={() => fetchInvoices('Unpaid')} sx={{ marginRight: 2 }}>
         View Unpaid Invoices
       </Button>
-      <Button variant="contained" color="secondary" onClick={() => fetchInvoices('Paid')}>
-        View Paid Invoices
-      </Button>
-      {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
-      {success && <Alert severity="success" sx={{ marginTop: 2 }}>{success}</Alert>}
-      {invoices.length > 0 && (
-        <TableContainer component={Paper} sx={{ marginTop: 4 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell><strong>Invoice ID</strong></TableCell>
-                <TableCell><strong>Report ID</strong></TableCell>
-                <TableCell><strong>Patient ID</strong></TableCell>
-                <TableCell><strong>Cost</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>{invoice.id}</TableCell>
-                  <TableCell>{invoice.report_id}</TableCell>
-                  <TableCell>{invoice.patient_id}</TableCell>
-                  <TableCell>${invoice.cost.toFixed(2)}</TableCell>
-                  <TableCell>{invoice.status}</TableCell>
-                  <TableCell>
-                    {invoice.status === 'Unpaid' && (
-                      <Button variant="outlined" color="primary" onClick={() => markAsPaid(invoice.id)}>
-                        Mark as Paid
-                      </Button>
-                    )}
-                  </TableCell>
+        <Button variant="contained" color="secondary" onClick={() => fetchInvoices('Paid')}>
+          View Paid Invoices
+        </Button>
+        {error && <Alert severity="error" sx={{ marginTop: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ marginTop: 2 }}>{success}</Alert>}
+        {invoices.length > 0 && (
+          <TableContainer component={Paper} sx={{ marginTop: 4 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><strong>Invoice ID</strong></TableCell>
+                  <TableCell><strong>Report ID</strong></TableCell>
+                  <TableCell><strong>Patient ID</strong></TableCell>
+                  <TableCell><strong>Cost</strong></TableCell>
+                  <TableCell><strong>Status</strong></TableCell>
+                  <TableCell><strong>Actions</strong></TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
-      {invoices.length === 0 && !loading && (
-        <Typography sx={{ marginTop: 4 }}>No invoices found for the selected status.</Typography>
-      )}
+              </TableHead>
+              <TableBody>
+                {invoices.map((invoice) => (
+                  <TableRow key={invoice.id}>
+                    <TableCell>{invoice.id}</TableCell>
+                    <TableCell>{invoice.report_id}</TableCell>
+                    <TableCell>{invoice.patient_id}</TableCell>
+                    <TableCell>${invoice.cost.toFixed(2)}</TableCell>
+                    <TableCell>{invoice.status}</TableCell>
+                    <TableCell>
+                      {invoice.status === 'Unpaid' && (
+                        <Button variant="outlined" color="primary" onClick={() => markAsPaid(invoice.id)}>
+                          Mark as Paid
+                        </Button>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
+        {invoices.length === 0 && !loading && (
+          <Typography sx={{ marginTop: 4 }}>No invoices found for the selected status.</Typography>
+        )}</>) : null}
+
     </Box>
   );
 };

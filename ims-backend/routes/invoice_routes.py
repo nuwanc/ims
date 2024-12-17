@@ -75,6 +75,43 @@ def filter_invoices():
         for invoice in invoices
     ])
 
+@invoice_routes.route("/filter/<int:patient_id>", methods=["GET"])
+@jwt_required()
+def filter_patient_invoices(patient_id):
+    claims = get_jwt()
+    if claims.get("role") != "finance_staff":
+        return jsonify({"message": "Unauthorized"}), 403
+
+    status = request.args.get("status")  # "Paid" or "Unpaid"
+    query = Invoice.query
+    if status:
+        query = query.filter(Invoice.status == status, Invoice.patient_id == patient_id)
+    else :
+        query = query.filter(Invoice.patient_id == patient_id)
+
+    invoices = query.all()
+
+    log_audit_action(
+        user_id=get_jwt_identity(),
+        action="FILTER",
+        table_name="invoices",
+        record_id=0,
+        details={"status": status, "count": len(invoices)},
+    )
+
+    return jsonify([
+        {
+            "id": invoice.id,
+            "report_id": invoice.report_id,
+            "patient_id": invoice.patient_id,
+            "cost": invoice.cost,
+            "status": invoice.status,
+            "generated_by": invoice.generated_by,
+            "created_at": invoice.created_at,
+        }
+        for invoice in invoices
+    ])
+
 @invoice_routes.route("/<int:invoice_id>/pay", methods=["PATCH"])
 @jwt_required()
 def mark_invoice_paid(invoice_id):

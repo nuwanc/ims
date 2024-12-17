@@ -79,7 +79,7 @@ const UserSearch = () => {
                         color="error"
                         onClick={() => deleteUser(user.id)}
                       >
-                        Delete
+                        Block
                       </Button>
                     </TableCell>
                   </TableRow>
